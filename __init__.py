@@ -19,32 +19,38 @@ bl_info = {
     "version" : (0, 0, 3),
     "location" : "View3D",
     "warning" : "",
-    "category" : "Generic"
+    "category" : "Import"
 }
 
 import bpy
 from bpy.props import *     # Additional Blender operation Properties
+from bpy_extras.io_utils import ImportHelper
 
 from . c2b_plot_tracts import *
 from . c2b_parser import *
 from . c2b_panel import *
 
 bpy.types.Scene.tract_file = StringProperty(name="Tract source file", 
-               subtype="FILE_PATH", 
                description="Location of the tract source file in UTF-8 plaintext format")
 
-bpy.types.Scene.tract_count = IntProperty(name="Tract count", 
-               subtype="UNSIGNED", 
-               description="The total count of all tract groups.")
+class Importer(bpy.types.Operator, ImportHelper):
+    bl_idname = "c2b.import"
+    bl_label = "import tracts"
 
-bpy.types.Scene.curve_count = IntProperty(name="Curve count", 
-               subtype="UNSIGNED", 
-               description="The total count of all curves in respective tracts.")
+    filename_ext = ".txt"
 
-bpy.types.Scene.vertex_count = IntProperty(name="Vertex count", 
-               subtype="UNSIGNED", 
-               description="The total count of all vertices in all tracts.")
+    filter_glob: StringProperty(
+        default="*.txt",
+        maxlen=255
+    )
 
-classes = (PlotTracts, Parser, Panel)
+    def execute(self, context: bpy.types.Context):
+        print("importing file:", self.filepath)
+        context.scene["tract_file"] = self.filepath
+        bpy.ops.c2b.parse() # trigger parser
+
+        return {'FINISHED'}
+
+classes = [PlotTracts, Parser, Panel, Importer]
 
 register, unregister = bpy.utils.register_classes_factory(classes)

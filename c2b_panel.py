@@ -7,26 +7,27 @@ class Panel(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
 
-    def draw(self, context):
+    def draw(self, context: bpy.types.Context):
             layout = self.layout
-            
-            row = layout.row()
-            row.label(text="Tract source file:")
 
             row = layout.row()
-            row.prop(context.scene, "tract_file", text="")
+            #row.prop(context.scene, "tract_file", text="")
+            row.operator('c2b.import', text="Import file", icon='IMPORT')
 
             row = layout.row()
-            row.label(text="Tracts: " + str(context.scene.tract_count))
+            row.prop(context.scene, 'tract_file', text="Filepath")
 
             row = layout.row()
-            row.label(text="Curves: " + str(context.scene.curve_count))
+            row.label(text=f'Tracts: {context.scene.get("tract_count")}')
 
             row = layout.row()
-            row.label(text="Vectors: " + str(context.scene.vertex_count))
+            row.label(text=f'Curves: {context.scene.get("curve_count")}')
 
             row = layout.row()
-            row.operator('c2b.parse', text="Calculate tract data")
+            row.label(text=f'Vectors: {context.scene.get("vertex_count")}')
 
             row = layout.row()
-            row.operator('c2b.plot_tracts', text="Plot tract as curves")
+            row.operator('c2b.parse', text="Recalculate tract data")
+
+            row = layout.row()
+            row.operator('c2b.plot_tracts', text="Plot tract as curves", icon='NORMALIZE_FCURVES')
